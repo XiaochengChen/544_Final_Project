@@ -1,6 +1,6 @@
 import socket
 import certificate
-import random 
+import random
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.ciphers.algorithms import TripleDES
@@ -12,15 +12,25 @@ PORT = 3030         # Same port as server
 def startClient():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
-        sendClientHello(s)
-        recvServerHello(s)
+        sendClientHello(s) #Send Client_Hello
+        recvServerHello(s) #Receive Server_Hello
+        recvPublicKey(s) #Receive Public Key
 
 def sendClientHello(s): # s is used to send the hello client message
     s.sendall(b'Client_Hello')
 
 def recvServerHello(s):
     serverHello = s.recv(1024) # Wait for serverHello message
-    print('Received, ', repr(serverHello))
+    print('Client Received, ', repr(serverHello))
     # Do something with the message
+
+def recvPublicKey(s):
+    publickey = s.recv(1024)
+    print('Client Received, ', repr(publickey))
+
+#Decryption for client
+def decrypt(rsa_privatekey,b64cipher):
+    plaintext = rsa_privatekey.decrypt(decoded_ciphertext)
+    return plaintext
 
 startClient()
