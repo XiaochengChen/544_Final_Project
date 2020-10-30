@@ -12,25 +12,36 @@ PORT = 3030         # Same port as server
 def startClient():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
-        sendClientHello(s) #Send Client_Hello
-        recvServerHello(s) #Receive Server_Hello
-        recvPublicKey(s) #Receive Public Key
+        sendClientHello(s)  # 2. Send Client_Hello
 
-def sendClientHello(s): # s is used to send the hello client message
+        # Note: Maybe these receive from server functions can be
+        #   separated based on what we want to do with the content
+        #   being received
+        recvFromServer(s)   # 4. Receive Server_Hello
+        recvFromServer(s)   # 7. Receive Public Key
+        recvFromServer(s)   # 9. Receive Encrypted Message
+        # 10. Get Private Key given RSA Public Key
+        # 11. Decrypt the received message
+        # decrypt(publickey, cipher_text)
+
+def sendClientHello(s):
+    # s is used to send the hello client message
+    # Send clientHello message with right contents
     s.sendall(b'Client_Hello')
 
-def recvServerHello(s):
-    serverHello = s.recv(1024) # Wait for serverHello message
-    print('Client Received, ', repr(serverHello))
+def recvFromServer(s):
+    serverMessage = s.recv(1024) # Wait for message from Server
+    print('Client Received, ', repr(serverMessage))
     # Do something with the message
 
-def recvPublicKey(s):
-    publickey = s.recv(1024)
-    print('Client Received, ', repr(publickey))
+#To fix: Decryption for client
+def decrypt(publickey, cipher_text):
+    getPrivateKey = RSA.importKey(open('private.pem').read())
+    privatekey = PKCS1_OAEP.new(getPrivateKey)
+    plain_text = cipher.decrypt(privatekey)
+    print('Client Received, ', repr(serverMessage))
 
-#Decryption for client
-def decrypt(rsa_privatekey,b64cipher):
-    plaintext = rsa_privatekey.decrypt(decoded_ciphertext)
-    return plaintext
+
+
 
 startClient()
