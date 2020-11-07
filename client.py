@@ -22,7 +22,7 @@ def startClient():
         #   being received
         recvServerHello(s)      # 4. Receive Server_Hello
         recvServerHelloDone(s)  
-        # recvFromServer(s)   # 7. Receive Public Key
+        recvCertiFromServer(s)   # 7. Receive Certificate from server and generate pre-master key
         # recvFromServer(s)   # 9. Receive Encrypted Message
         # 10. Get Private Key given RSA Public Key
         # 11. Decrypt the received message
@@ -31,7 +31,7 @@ def startClient():
 def sendClientHello(s):
     cypherSuit = b'{ "Cipher": "DES", "MAC":"SHA-1", "CipherType":"Block", "HashSize":"20"}'
     s.sendall(cypherSuit)
-    return str(cypherSuit)
+    return cypherSuit.decode("utf-8")
 
 def recvServerHello(s):
     serverMessage = s.recv(1024) # Wait for message from Server
@@ -40,6 +40,11 @@ def recvServerHello(s):
 
 def recvServerHelloDone(s):
     pass
+    
+def recvCertiFromServer(s):
+    s. recv(1024)
+    print('Client received certificate')
+    #TODO: generate pre-master key(48 byte encrypted with server's RSA public key)
 
 #To fix: Decryption for client
 def decrypt(publickey, cipher_text):
