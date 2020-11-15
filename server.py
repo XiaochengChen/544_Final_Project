@@ -3,10 +3,9 @@ import json
 import os
 import time
 import hashlib
+import RSA
 
 import Cryptodome
-from Cryptodome.Cipher import PKCS1_OAEP
-from Cryptodome.PublicKey import RSA
 from Cryptodome import Random
 from Cryptodome.Hash import SHA1
 
