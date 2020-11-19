@@ -241,7 +241,6 @@ class des():
         result = []
         for block in subblocks:
             tempstr = ''.join(str(ch) for ch in block)
-            print(block)
             temp = list(self.compute_s_box(tempstr,round))
             [result.append(int(n)) for n in temp]
             round += 1
@@ -276,10 +275,10 @@ class des():
     
     def addPadding(self):#Add padding to the datas using PKCS5 spec.
         pad_len = 8 - (len(self.text) % 8)
-        self.text += pad_len * chr(pad_len)
+        self.text += pad_len * str(pad_len).encode("utf-8")
     
     def removePadding(self, data):#Remove the padding of the plain text (it assume there is padding)
-        pad_len = ord(data[-1])
+        pad_len = int(data[-1])
         return data[:-pad_len]
     
     def encrypt(self, key, text, padding=False,cbc=False,IV='ASASASAS'):
