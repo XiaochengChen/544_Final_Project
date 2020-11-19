@@ -27,11 +27,14 @@ def startClient():
         # 3. Receive Certificate from server and generate pre-master key
         serverPublicKey, serverCertificateBytes = recvCertiFromServer(s)
         allMsgsHash.update(serverCertificateBytes)
-
-        preMasterSecretBytes = sendPreMasterSecret(s, serverPublicKey) # 3.5 Send Premaster key
+        
+        allMsgsHash.update(recvServerHelloDone(s))      # 4. Receive Server_hello_done
+        
+        
+        preMasterSecretBytes = sendPreMasterSecret(s, serverPublicKey) # 5. Send Premaster key
         allMsgsHash.update(preMasterSecretBytes)
 
-        allMsgsHash.update(recvServerHelloDone(s))      # 4. Receive Server_hello_done
+        
 
         masterSecret = createMasterSecret(preMasterSecretBytes,\
              cipherSuitjson["randomNonce"].encode("utf-8"), serverHellojson["randomNonce"].encode("utf-8"))
