@@ -14,7 +14,7 @@ HOST = '127.0.0.1'  # Localhost
 PORT = 3030         # Listening port
 thirdPartyPrivateKey, thirdPartyPublicKey  = RSA.generate_keypair(1297279, 1297657)
 
-def startServer():
+def startServer(flag=False):
     privatekey, publickey = rsakeys()
     print(privatekey, publickey) #Private and public keys
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -44,7 +44,7 @@ def startServer():
             
             fileName = recvSoftwareRequest(conn)                 # 6. Recv software request from clients
 
-            sendSoftware(conn, fileName, masterSecret, privatekey)
+            sendSoftware(conn, fileName, masterSecret, privatekey, flag)
 
 def recvClientHello(conn):
     cipherSuitBytes = conn.recv(1024)
@@ -147,7 +147,7 @@ def recvSoftwareRequest(s):
     print("\n5. Server receives software request:\n\t>>>", softwareRequest)
     return json.loads(softwareRequest)["File Name"]
 
-def sendSoftware(s, fileName, desKey, privateRSAKey):
+def sendSoftware(s, fileName, desKey, privateRSAKey, flag=False):
     with open(fileName, "rb") as rawFile:
         softwareFile = rawFile.read()
         #Splits the software file into a sublist of length n.
@@ -158,13 +158,17 @@ def sendSoftware(s, fileName, desKey, privateRSAKey):
             if packetN % 50 == 0:
                 print(f"Sending packet #{packetN}...")
             packetToSend = createPacket(splitFile[packetN], desKey, privateRSAKey, packetN)
-            s.sendall(packetToSend)
-            if packetN % 50 == 0:
-                print(f"Waiting for ACK on packet {packetN}...")
+            if flag:
+                s.sendall(maliciousPacket(packetToSend))
+            else: 
+                s.sendall(packetToSend)
+            
             if not getPacketConfirmation(s, packetN):
                 print("Got wrong confirmation packet, cancelling...")
                 return
-    
+            if packetN % 50 == 0:
+                print(f"Waiting for ACK on packet {packetN}...")
+
 def sendInfoAboutPackets(s, fileName, m):
     info = b'{"File Name": "%b", "Number of packets": "%d"}' % (fileName.encode("utf-8"), m)
     s.sendall(info)
@@ -192,8 +196,11 @@ def encryptDEShelper(data, key):
     temp = [str(i) for i in rByte]
     return ' '.join(temp)
 
-def decryptDEShelper(ciphertext, key):
-    pass
+def maliciousPacket(originalPacket):
+    ogPacket = json.loads(originalPacket)
+    ogPacket["Payload"]["Data"] = 'Modified data'
+    return json.dumps(ogPacket).encode("utf-8")
+
 
 def getPacketConfirmation(s, n):
     ACKn = json.loads(s.recv(100))
@@ -204,4 +211,4 @@ def getPacketConfirmation(s, n):
     return True
 
 print('Server listening on: ', PORT)
-startServer()
+startServer(True) # Add parameter 'True' if needed to show protection to attack
