@@ -9,5 +9,11 @@ The services are:
     - Integrity
     - Confidentiality
 
-To install packages run:
+Install required libraries using this:
     `pip install -r requirements.txt`
+
+To run this:
+    Just open two terminals and run:
+        `python server.py`
+        `python client.py`
+    Note: Make sure to run this using python3 (Tested using python 3.7.4)
