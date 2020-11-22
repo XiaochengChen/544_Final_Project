@@ -16,7 +16,7 @@ thirdPartyPrivateKey, thirdPartyPublicKey  = RSA.generate_keypair(1297279, 12976
 
 def startServer(flag=False):
     privatekey, publickey = rsakeys()
-    print(privatekey, publickey) #Private and public keys
+    
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((HOST, PORT))
         s.listen()
@@ -93,7 +93,7 @@ def recvPreMasterSecret(s, pk):
     encryptedPreMasterSecret = s.recv(1024) 
     intArrOfPreMasterSecret = [int(n) for n in encryptedPreMasterSecret.decode("utf-8").split()]
     preMasterSecret = decrypt(pk, intArrOfPreMasterSecret)
-    print("\n3.5 Receive premasterSecret (encrypted):\n\t>>>", preMasterSecret)
+    print("\n5. Receive premasterSecret (encrypted):\n\t>>>", preMasterSecret)
     return preMasterSecret
 
 #Private key and public key
@@ -117,7 +117,9 @@ def decrypt(pk, ciphertext):
 
 def sendServerDone(s):
     # Send serverHello message with right contents
-    s.sendall(b'Server_Hello_Done')
+    helloDone = b'Server_Hello_Done' 
+    s.sendall(helloDone)
+    print("4. Send server Hello done:\n\t>>>", helloDone)
     return b'Server_Hello_Done'
 
 def createMasterSecret(preMasterSecretBytes, clientRandom, serverRandom):
@@ -144,7 +146,7 @@ def md5Helper(byteArr):
 
 def recvSoftwareRequest(s):
     softwareRequest = s.recv(30)
-    print("\n5. Server receives software request:\n\t>>>", softwareRequest)
+    print("\n6. Server receives software request:\n\t>>>", softwareRequest)
     return json.loads(softwareRequest)["File Name"]
 
 def sendSoftware(s, fileName, desKey, privateRSAKey, flag=False):
@@ -206,9 +208,9 @@ def getPacketConfirmation(s, n):
     ACKn = json.loads(s.recv(100))
     if ACKn["Packet Number"] != str(n):
         print(f"Did not get ACK for packet #{n}\nGot:")
-        print("\t",ACKn)
+        print("\t", ACKn)
         return False
     return True
 
 print('Server listening on: ', PORT)
-startServer(True) # Add parameter 'True' if needed to show protection to attack
+startServer() # Add parameter 'True' if needed to show protection to attack
