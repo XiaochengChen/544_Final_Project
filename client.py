@@ -75,7 +75,7 @@ def recvCertiFromServer(s):
 
 def sendPreMasterSecret(s, pk):
     preMasterSecret = generatePreMasterSecret()
-    print("\n3.5 Send premasterSecret (encrypted):\n\t>>>", preMasterSecret)
+    print("\n5. Send premasterSecret (encrypted):\n\t>>>", preMasterSecret)
     temp = encrypt(pk, preMasterSecret)
     encryptedPreMasterSecret = ' '.join([str(n) for n in temp])
     s.sendall(encryptedPreMasterSecret.encode("utf-8"))
@@ -137,7 +137,7 @@ def md5Helper(byteArr):
 def sendSoftwareRequest(s):
     request = b'{"File Name" : "penguin.png"}'
     s.sendall(request)
-    print("\n5. Client send software request:\n\t", request)
+    print("\n6. Client send software request:\n\t", request)
 
 def recvSoftware(s, desKey, serverPublicKey):
     infoAboutPackets = json.loads(s.recv(100))
